@@ -1,6 +1,9 @@
 name: Mirror Main Branch from Upstream
 
 on:
+  push:
+    branches:
+      - workflow-branch
   schedule:
     - cron: '0 0 * * *' # Runs daily at midnight
   workflow_dispatch:
