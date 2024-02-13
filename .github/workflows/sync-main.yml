@@ -1,0 +1,35 @@
+name: Mirror Main Branch from Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at midnight
+  workflow_dispatch:
+
+jobs:
+  sync-main-branch:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Git and Checkout
+      uses: actions/checkout@v3 # Updated to the latest version
+      with:
+        ref: main
+        fetch-depth: 0 # Fetch all history for all tags and branches
+
+    - name: Configure git
+      run: |
+        git config --global user.name "MrQuality"
+        git config --global user.email "mrnirrozen@gmail.com"
+    - name: Add upstream repository
+      run: git remote add upstream https://github.com/KubeVirt/kubevirt.git
+
+    - name: Fetch changes from upstream
+      run: git fetch upstream
+
+    - name: Reset main branch to upstream's state
+      run: |
+        git checkout main
+        git reset --hard upstream/main
+    - name: Push changes to the forked repository
+      run: git push origin main --force
+      env:
+        GITHUB_TOKEN: ${{ secrets.MIRROR_PAT }}
